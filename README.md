@@ -1,5 +1,5 @@
 # acquia-tools
 Handy scripts for working with Acquia cloud
 
-## @TODO
-- [ ] Installer Script (to dump these in `/usr/local/bin`)
+### Installation
+Run `curl -sL https://goo.gl/CGXVpQ | bash`
