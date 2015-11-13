@@ -14,4 +14,4 @@ curl -sso ac-update https://raw.githubusercontent.com/clwdev/ac-tools/master/ac-
 chmod 0755 ac-update
 
 echo "Installation complete"
-cd -
+cd - >/dev/null 2>&1
