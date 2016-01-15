@@ -7,13 +7,21 @@ if [ "$1" = "" ] || [ "$2" = "" ]
 then
   echo "Retrieves past and present logs for a site in Acquia Enterprise"
   echo "Usage:    $0 <site-alias> <site-environment>"
-  echo "Example:  $0 zeg test"
+  echo "Example:  $0 tcs test"
+  echo "Example:  $0 dom.zeg dev"
   exit 1
 fi
 
 site="$1"
 remote_env="$2"
 drush_alias=$site'.'$remote_env
+if [[ $site == *"."* ]]
+then
+  site_split=(${site//./ })
+  env_alias=${site_split[0]}'.'$remote_env
+else
+  env_alias=$drush_alias
+fi
 
 function remotecheck
 {
@@ -96,7 +104,7 @@ function pastlogs
   pwd=`pwd`
   echo "Downloading logs to temporary location. This will take a minute."
 
-  rsync -rLktIzq $drush_alias@$hostname.prod.hosting.acquia.com:/var/log/sites/$drush_alias/logs/$hostname/ "$tmpdir"
+  rsync -rLktIzq $env_alias@$hostname.prod.hosting.acquia.com:/var/log/sites/$env_alias/logs/$hostname/ "$tmpdir"
 
   echo "Extracting logs for quicker searching with grep."
   gunzip *.gz
