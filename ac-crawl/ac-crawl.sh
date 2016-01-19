@@ -19,7 +19,13 @@ fi
 path=`pwd`
 
 read -p "Username [none]: " user
-read -p "Password [none]: " pass
+if [ -z "$user" ]
+then
+  auth=""
+else
+  read -p "Password [none]: " pass
+  auth="--user=$user --password=$pass"
+fi
 read -p "Save site to [$path]: " path
 
 cd $path
@@ -30,16 +36,16 @@ select opt in "${options[@]}"
 do
   case $REPLY in
     1 ) echo "Mirror mode selected."
-        wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --user=$user --password=$pass $url
+        wget --mirror --convert-links --adjust-extension --page-requisites --no-parent $auth $url
         cd - ; exit ;;
     2 ) echo "Testing mode selected."
-        wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --user=$user --password=$pass --random-wait --reject=gif,jpg,jpeg,pdf,png,css,js $url
+        wget --mirror --convert-links --adjust-extension --page-requisites --no-parent $auth --random-wait --reject=gif,jpg,jpeg,pdf,png,css,js $url
         cd - ; exit ;;
     3 ) echo "Cache warming mode selected."
-        wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --user=$user --password=$pass --limit-rate=100k --random-wait --reject=gif,jpg,jpeg,pdf,png,css,js $url
+        wget --mirror --convert-links --adjust-extension --page-requisites --no-parent $auth --limit-rate=100k --random-wait --reject=gif,jpg,jpeg,pdf,png,css,js $url
         cd - ; exit ;;
     4 ) echo "Simulation mode selected."
-        wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --user=$user --password=$pass --limit-rate=100k --wait=20 --reject=gif,jpg,jpeg,pdf,png,css,js $url
+        wget --mirror --convert-links --adjust-extension --page-requisites --no-parent $auth --limit-rate=100k --wait=20 --reject=gif,jpg,jpeg,pdf,png,css,js $url
         cd - ; exit ;;
     5 ) exit ;;
     * ) echo "invalid option" ;;
