@@ -21,6 +21,7 @@ function upsearch () {
 remote_site="$1"
 local_site="$1"
 remote_env="$2"
+mode="$3"
 current_time=$(date "+%Y.%m.%d-%H.%M.%S")
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -363,7 +364,7 @@ function correctdata
   cd -
   drush $local_site -y sql-query "UPDATE users SET pass = '$hash' WHERE uid <> 0;" >/dev/null 2>&1
 
-  if [ "$3" != "fast" ]
+  if [ "$mode" != "fast" ]
   then
     echo; echo "Rebuilding registry."
     drush $local_site -y rr
@@ -386,7 +387,7 @@ function correctdata
 
   echo "Database correction complete."; echo
 
-  if [ "$3" != "fast" ]
+  if [ "$mode" != "fast" ]
   then
     featurecheck
   fi
@@ -574,7 +575,7 @@ function allfunctionsfast
 {
   echo "Performing fast functions (database only, no checking)."
   note "Performing fast functions (database only, no checking)."
-  gitpull
+  # gitpull
   contributions
   remotecheck
   localcheck first
@@ -622,7 +623,7 @@ function tend
 }
 
 # Run preselected option, or provide a menu
-case "$3" in
+case "$mode" in
   all ) tstart; allfunctions; tend; exit;;
   live ) tstart; allfunctionslive; tend; exit;;
   fast ) tstart; allfunctionsfast; tend; exit;;
