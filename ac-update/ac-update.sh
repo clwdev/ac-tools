@@ -363,8 +363,11 @@ function correctdata
   cd -
   drush $local_site -y sql-query "UPDATE users SET pass = '$hash' WHERE uid <> 0;" >/dev/null 2>&1
 
-  echo; echo "Rebuilding registry."
-  drush $local_site -y rr
+  if [ "$3" != "fast" ]
+  then
+    echo; echo "Rebuilding registry."
+    drush $local_site -y rr
+  fi
 
   echo; echo "Checking update status."
   updb_status=$( drush $local_site -y updatedb-status 2>&1 )
@@ -383,8 +386,10 @@ function correctdata
 
   echo "Database correction complete."; echo
 
-  featurecheck
-
+  if [ "$3" != "fast" ]
+  then
+    featurecheck
+  fi
 }
 
 # Ask the usuer to select a mechanism of syncing data
@@ -565,6 +570,25 @@ function allfunctions
   note "All finished updating. Click here to open!" 1
 }
 
+function allfunctionsfast
+{
+  echo "Performing fast functions (database only, no checking)."
+  note "Performing fast functions (database only, no checking)."
+  gitpull
+  contributions
+  remotecheck
+  localcheck first
+  # backupdata
+  syncdatafrombackup
+  localcheck
+  correctdata
+  # note "Database updates done. Syncing files now. You can jump into Drupal now." 1
+  # syncfiles
+  # securitycheck
+  # summary
+  note "All finished updating. Click here to open!" 1
+}
+
 function allfunctionslive
 {
   echo "Performing all functions with live data."
@@ -597,42 +621,36 @@ function tend
   echo "Duration: $(($endtime - $starttime)) seconds."; echo
 }
 
-if [ "$3" != "all" ]
-then
-  options=("Git pull (on current branch)." "Symlink module/library contributions" "Back up local database." "Pull down database." "Correct local database for development." "Check feature status." "Pull down files." "Check for security updates." "All of the above (using backup)." "All of the above (using live data).")
-  PS3="Choose a function: "
-  select opt in "${options[@]}" "Quit"; do
-      echo
-      case "$REPLY" in
+# Run preselected option, or provide a menu
+case "$3" in
+  all ) tstart; allfunctions; tend; exit;;
+  live ) tstart; allfunctionslive; tend; exit;;
+  fast ) tstart; allfunctionsfast; tend; exit;;
+  *) options=("Git pull (on current branch)." "Run make." "Symlink module/library contributions" "Back up local database." "Pull down database." "Correct local database (updb, fra, etc)." "Check feature stability." "Pull down files." "Check modules for security updates." "All of the above (using backup)." "All of the above (using live data).")
+    PS3="Choose a function: "
+    select opt in "${options[@]}" "Quit"; do
+        echo
+        case "$REPLY" in
 
-      1 ) tstart; gitpull; tend; exit;;
-      2 ) tstart; contributions; tend; exit;;
-      3 ) tstart; localcheck first; backupdata; tend; exit;;
-      4 ) tstart; syncdatachoice; tend; exit;;
-      5 ) tstart; localcheck first; correctdata; summary; tend; exit;;
-      6 ) tstart; featurecheck; tend; exit;;
-      7 ) tstart; remotecheck; localcheck first; syncfiles; tend; exit;;
-      8 ) tstart; securitycheck; tend; exit;;
-      9 ) tstart; allfunctions; tend; exit;;
-      10 ) tstart; allfunctionslive; tend; exit;;
+        1 ) tstart; gitpull; tend; exit;;
+        2 ) tstart; cleanup; makephprun; tend; exit;;
+        3 ) tstart; contributions; tend; exit;;
+        4 ) tstart; localcheck first; backupdata; tend; exit;;
+        5 ) tstart; syncdatachoice; tend; exit;;
+        6 ) tstart; localcheck first; correctdata; summary; tend; exit;;
+        7 ) tstart; featurecheck; tend; exit;;
+        8 ) tstart; remotecheck; localcheck first; syncfiles; tend; exit;;
+        9 ) tstart; securitycheck; tend; exit;;
+        10 ) tstart; allfunctions; tend; exit;;
+        11 ) tstart; allfunctionslive; tend; exit;;
 
-      $(( ${#options[@]}+1 )) ) echo "See ya!";
-          break;;
+        $(( ${#options[@]}+1 )) ) echo "See ya!";
+            break;;
 
-      *) echo "Invalid option. Try again.";
-          continue;;
+        *) echo "Invalid option. Try again, looser.";
+            continue;;
 
-      esac
-  done
-  exit
-else
-  tstart
-  if [ "$4" != "live" ]
-  then
-    allfunctions
-  else
-    allfunctionslive
-  fi
-  tend
-  exit
-fi
+        esac
+    done
+    exit ;;
+esac
