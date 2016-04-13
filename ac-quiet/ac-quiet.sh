@@ -11,7 +11,7 @@ function note
   notifier_installed=$(which terminal-notifier);
   if [ "$notifier_installed" != "" ]
   then
-    terminal-notifier -message "$1" -title "Acquia Tasks Complete" -appIcon http://i.imgur.com/hlrUNId.png -sender ac-quiet.sh -sound Pop
+    terminal-notifier -message "$1" -title "Acquia Tasks Complete" -appIcon https://i.imgur.com/hlrUNId.png -sender ac-quiet.sh -sound Pop
   fi
 }
 
