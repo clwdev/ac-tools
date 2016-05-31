@@ -151,11 +151,44 @@ function localcheck
 # Use drush rsync to update local files to match the remote
 function syncfiles
 {
-  echo "Syncing files from @${site}.${remote_env} to local $local_site."
+  echo "Syncing files from @${remote_site}.${remote_env} to local $local_site."
   echo "This can take a few minutes."
   drush -y rsync @$remote_site.$remote_env:%files $local_site:%files --delete --progress
 
   echo "File sync complete."; echo
+}
+
+# Install / enable stage_file_proxy
+function stagefileproxy
+{
+  echo "Setting up Stage File Proxy."
+  drush --uri="$local_site" dl -n stage_file_proxy --destination=profiles/d2/modules/contrib >/dev/null 2>&1
+  drush --uri="$local_site" en -y stage_file_proxy >/dev/null 2>&1
+  domain=$(drush @$remote_site.$remote_env php-eval "global \$base_url; echo \$base_url;")
+  echo "    Remote URL: $domain"
+  drush --uri="$local_site" vset stage_file_proxy_origin "$domain" >/dev/null 2>&1
+}
+
+# Allow user to choose method of handling files
+function fileschoice
+{
+  options=("Set up Stage File Proxy (default)", "Sync all files using rsync (hold on to your hard drives)")
+  PS3="Choose a method: "
+  select opt in "${options[@]}" "Quit"; do
+      echo
+      case "$REPLY" in
+
+      1 ) remotecheck; localcheck first; stagefileproxy; exit;;
+      2 ) remotecheck; localcheck first; syncfiles; exit;;
+
+      $(( ${#options[@]}+1 )) ) echo "See ya!";
+          break;;
+
+      *) echo "Invalid option. Try again, looser.";
+          continue;;
+
+      esac
+  done
 }
 
 # Backup the local MySQL database
@@ -603,7 +636,7 @@ function allfunctionslive
   localcheck
   correctdata
   note "Database updates done. You can jump into Drupal now or wait till files are synced." 1
-  syncfiles
+  stagefileproxy
   securitycheck
   summary
   note "All finished updating. Click here to open!" 1
@@ -627,7 +660,7 @@ case "$mode" in
   all ) tstart; allfunctions; tend; exit;;
   live ) tstart; allfunctionslive; tend; exit;;
   fast ) tstart; allfunctionsfast; tend; exit;;
-  *) options=("Git pull (on current branch)." "Run make." "Symlink module/library contributions" "Back up local database." "Pull down database." "Correct local database (updb, fra, etc)." "Check feature stability." "Pull down files." "Check modules for security updates." "All of the above (using backup)." "All of the above (using live data).")
+  *) options=("Git pull (on current branch)." "Run make." "Symlink module/library contributions" "Back up local database." "Pull down database." "Correct local database (updb, fra, etc)." "Check feature stability." "Get files (rsync / proxy)." "Check modules for security updates." "All of the above (using backup)." "All of the above (using live data).")
     PS3="Choose a function: "
     select opt in "${options[@]}" "Quit"; do
         echo
@@ -640,7 +673,7 @@ case "$mode" in
         5 ) tstart; syncdatachoice; tend; exit;;
         6 ) tstart; localcheck first; correctdata; summary; tend; exit;;
         7 ) tstart; featurecheck; tend; exit;;
-        8 ) tstart; remotecheck; localcheck first; syncfiles; tend; exit;;
+        8 ) tstart; remotecheck; localcheck first; fileschoice; tend; exit;;
         9 ) tstart; securitycheck; tend; exit;;
         10 ) tstart; allfunctions; tend; exit;;
         11 ) tstart; allfunctionslive; tend; exit;;
