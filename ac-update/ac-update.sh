@@ -162,11 +162,13 @@ function syncfiles
 function stagefileproxy
 {
   echo "Setting up Stage File Proxy."
-  drush --uri="$local_site" dl -n stage_file_proxy --destination=profiles/d2/modules/contrib >/dev/null 2>&1
+  drush --uri="$local_site" dl -n stage_file_proxy >/dev/null 2>&1
   drush --uri="$local_site" en -y stage_file_proxy >/dev/null 2>&1
+  echo "    Retreiving base_url."
   domain=$(drush @$remote_site.$remote_env php-eval "global \$base_url; echo \$base_url;")
   echo "    Remote URL: $domain"
   drush --uri="$local_site" vset stage_file_proxy_origin "$domain" >/dev/null 2>&1
+  echo "    Proxy configured."
 }
 
 # Allow user to choose method of handling files
