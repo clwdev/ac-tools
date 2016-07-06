@@ -10,8 +10,8 @@ else
   echo "URL to crawl: $url"
 fi
 
-logstreamloc=$(which logstream);
-if [ "$logstreamloc" = "" ];
+wgetloc=$(which wget);
+if [ "$wgetloc" = "" ];
 then
   brew install wget
 fi
