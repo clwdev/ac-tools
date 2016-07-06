@@ -7,7 +7,6 @@ then
   read -p "URL to crawl: " url
 else
   url="$1"
-  echo "URL to crawl: $url"
 fi
 
 wgetloc=$(which wget);
