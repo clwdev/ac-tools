@@ -16,17 +16,35 @@ then
   brew install wget
 fi
 
-path=`pwd`
+function cleanup {
+  rm -rf "$path"
+  echo ; echo "Cleanup of $path complete."
+}
 
-read -p "Username [none]: " user
-if [ -z "$user" ]
+if [ "$2" = "discard" ]
 then
-  auth=""
-else
-  read -p "Password [none]: " pass
-  auth="--user=$user --password=$pass"
+  path=`mktemp -d`
+  trap cleanup EXIT
+else 
+  path=`pwd`
+  read -p "Save site to [$path]: " path
 fi
-read -p "Save site to [$path]: " path
+
+if [ "$3" = "" ]
+then
+  # no user info passed in
+  read -p "Username [none]: " user
+  if [ -z "$user" ]
+  then
+    auth=""
+  else
+    read -p "Password [none]: " pass
+    auth="--user=$user --password=$pass"
+  fi
+else
+  # assume user and password were passed in
+  auth="${@:3}"
+fi
 
 cd $path
 
