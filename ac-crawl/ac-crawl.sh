@@ -1,5 +1,9 @@
 #!/bin/bash
 # Crawls a site using wget to warm caches and provide feedback to NewRelic. Skips files on command.
+#
+# Full CLI Mode:
+# ./ac-crawl.sh url discard [--user=username --password=password]
+# (Username and Password are optional. Technically you can also pass extra parameters into wget this way.)
 
 if [ "$1" = "" ]
 then
