@@ -5,6 +5,8 @@
 # ./ac-crawl.sh url discard [--user=username --password=password]
 # (Username and Password are optional. Technically you can also pass extra parameters into wget this way.)
 
+set +e
+
 if [ "$1" = "" ]
 then
   echo "Retrieves past and present logs for a site in Acquia Enterprise."
