@@ -84,5 +84,7 @@ then
   done
 else
   # Non-Interactive Mode
-  wget --recursive --level=100 --page-requisites --no-parent --reject=gif,jpg,jpeg,pdf,png,css,js,"*devel*" --reject-regex '(.*)\?(.*)' --no-clobber --timeout=300 --no-dns-cache --no-cache --no-verbose $auth $url
+  wget --recursive --level=100 --page-requisites --no-parent --adjust-extension --reject=gif,jpg,jpeg,pdf,png,css,js,"*devel*" --reject-regex '(.*)\?(.*)' --no-clobber --timeout=300 --no-dns-cache --no-cache --no-verbose $auth $url
+  cd -
+  exit 0
 fi
