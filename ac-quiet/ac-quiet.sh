@@ -16,27 +16,31 @@ function note
 }
 
 site="$1"
-
-oldlogs=""
-newlogs="$(drush @$site.dev ac-task-list --state=started)"
-if [[ $newlogs != '' ]]
-then
-  echo "Waiting for all prior tasks to complete:"
-  while [[ $newlogs != '' ]]
-  do
-    # Checking consumes resources, so wait for 5 seconds between checks.
+oldlogs=" "
+newlogs=" "
+firstrun="1"
+while [[ ! -z $newlogs || $? != 0 ]]
+do
+  if [[ $firstrun = "1" ]]
+  then
+    printf "Waiting for all prior tasks to complete on '$site'."
+    firstrun="0"
+  else
+    printf "."
+    # Checking consumes resources, so wait for a few seconds between checks.
     sleep 5
-    newlogs="$(drush @$site.dev ac-task-list --state=started)"
-    if [[ $newlogs != $oldlogs ]]
+  fi
+  newlogs="$(drush @$site.dev ac-task-list --state=started)"
+  if [[ $newlogs != $oldlogs ]]
+  then
+    logdiff=${newlogs//"$oldlogs"/}
+    logdiff=${logdiff//"\n"/}
+    if [[ $logdiff != "" ]]
     then
-      logdiff=${newlogs//"$oldlogs"/}
-      logdiff=${logdiff//"\n"/}
-      if [[ $logdiff != "" ]]
-      then
-        echo "$logdiff"
-      fi
+      printf "\n    $logdiff"
     fi
-    oldlogs="$newlogs"
-  done
-fi
-note "Acquia Environment '$site' is now quiet"
+  fi
+  oldlogs="$newlogs"
+done
+printf "\nAcquia Environment '$site' is now quiet.\n"
+note "Acquia Environment '$site' is now quiet."
