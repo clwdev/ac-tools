@@ -30,7 +30,7 @@ do
     # Checking consumes resources, so wait for a few seconds between checks.
     sleep 5
   fi
-  newlogs="$(drush @$site.dev ac-task-list --state=started)"
+  newlogs="$(drush @$site.dev ac-task-list --state=started 2>&1)"
   if [[ $newlogs != $oldlogs ]]
   then
     logdiff=${newlogs//"$oldlogs"/}
