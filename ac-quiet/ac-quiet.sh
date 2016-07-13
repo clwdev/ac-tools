@@ -16,7 +16,7 @@ function note
 }
 
 site="$1"
-oldlogs=" "
+oldlogs=""
 newlogs=" "
 firstrun="1"
 while [[ ! -z $newlogs || $? != 0 ]]
@@ -37,7 +37,7 @@ do
     logdiff=${logdiff//"\n"/}
     if [[ $logdiff != "" ]]
     then
-      printf "\n    $logdiff"
+      printf "\n    $newlogs"
     fi
   fi
   oldlogs="$newlogs"
