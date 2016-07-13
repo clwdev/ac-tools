@@ -37,7 +37,7 @@ do
     logdiff=${logdiff//"\n"/}
     if [[ $logdiff != "" ]]
     then
-      printf "\n    $newlogs"
+      printf "\n$newlogs"
     fi
   fi
   oldlogs="$newlogs"
