@@ -94,8 +94,8 @@ function pastlogs
   echo "Retrieving past logs for searching and aggregating." ; echo
   echo "Site: @$drush_alias"
 
-  hostname=`drush @$drush_alias core-status "db-hostname" --format=yaml`
-  hostname=${hostname/db-hostname: /}
+  hostname=`drush @qrk.prod php-eval "echo gethostname();"`
+  hostname=${hostname/.prod.hosting.acquia.com/}
 
   echo "Hostname: [$hostname]"
 
