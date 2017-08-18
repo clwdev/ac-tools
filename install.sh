@@ -16,5 +16,8 @@ chmod 0755 ac-update
 curl -sso ac-crawl https://raw.githubusercontent.com/clwdev/ac-tools/master/ac-crawl/ac-crawl.sh
 chmod 0755 ac-crawl
 
+curl -sso ac-db https://raw.githubusercontent.com/clwdev/ac-tools/master/ac-db/ac-db.sh
+chmod 0755 ac-db
+
 echo "Installation complete"
 cd - >/dev/null 2>&1
