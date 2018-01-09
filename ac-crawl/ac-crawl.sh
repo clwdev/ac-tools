@@ -9,7 +9,7 @@ set +e
 
 if [ "$1" = "" ]
 then
-  echo "Retrieves past and present logs for a site in Acquia Enterprise."
+  echo "Crawls a site using wget to warm caches and provide baseline perf results in NewRelic. Skips files on command."
   read -p "URL to crawl: " url
 else
   url="$1"
